@@ -19,50 +19,42 @@ public class SAConfettiView: UIView {
         case Image(UIImage)
     }
 
-    var emitter: CAEmitterLayer!
-    public var colors: [UIColor]!
-    public var intensity: Float!
-    public var type: ConfettiType!
+    public var colors: [UIColor] = [
+        UIColor(red:0.95, green:0.40, blue:0.27, alpha:1.0),
+        UIColor(red:1.00, green:0.78, blue:0.36, alpha:1.0),
+        UIColor(red:0.48, green:0.78, blue:0.64, alpha:1.0),
+        UIColor(red:0.30, green:0.76, blue:0.85, alpha:1.0),
+        UIColor(red:0.58, green:0.39, blue:0.55, alpha:1.0),
+    ]
+    public var intensity: Float = 1
+    public var type: ConfettiType = .Confetti
     
-    required public init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-        setup()
-    }
-    
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        setup()
-    }
-    
-    func setup() {
-        colors = [UIColor(red:0.95, green:0.40, blue:0.27, alpha:1.0),
-            UIColor(red:1.00, green:0.78, blue:0.36, alpha:1.0),
-            UIColor(red:0.48, green:0.78, blue:0.64, alpha:1.0),
-            UIColor(red:0.30, green:0.76, blue:0.85, alpha:1.0),
-            UIColor(red:0.58, green:0.39, blue:0.55, alpha:1.0)]
-        intensity = 0.5
-        type = .Confetti
-    }
-    
-    public func startConfetti() {
-        emitter = CAEmitterLayer()
+    lazy var emitter: CAEmitterLayer = {
+        let emitter = CAEmitterLayer()
         
-        emitter.emitterPosition = CGPoint(x: center.x, y: 0)
+        emitter.emitterPosition = CGPoint(x: self.center.x, y: -100)
         emitter.emitterShape = kCAEmitterLayerLine
-        emitter.emitterSize = CGSize(width: frame.size.width, height: 1)
+        emitter.emitterSize = CGSize(width: self.frame.size.width, height: 1)
         
         var cells = [CAEmitterCell]()
-        for color in colors {
-            cells.append(confettiWithColor(color))
+        for color in self.colors {
+            cells.append(self.confettiWithColor(color))
         }
         
         emitter.emitterCells = cells
+        
+        return emitter
+    }()
+
+    
+    public func startConfetti() {
         layer.addSublayer(emitter)
     }
     
     public func stopConfetti() {
-        emitter?.birthRate = 0
+        emitter.removeFromSuperlayer()
     }
+    
     
     func imageForType(type: ConfettiType) -> UIImage? {
         
@@ -98,14 +90,14 @@ public class SAConfettiView: UIView {
         confetti.lifetime = 14.0 * intensity
         confetti.lifetimeRange = 0
         confetti.color = color.CGColor
-        confetti.velocity = CGFloat(350.0 * intensity)
-        confetti.velocityRange = CGFloat(80.0 * intensity)
+        confetti.velocity = CGFloat(150)
+        confetti.velocityRange = CGFloat(40)
         confetti.emissionLongitude = CGFloat(M_PI)
         confetti.emissionRange = CGFloat(M_PI_4)
-        confetti.spin = CGFloat(3.5 * intensity)
-        confetti.spinRange = CGFloat(4.0 * intensity)
-        confetti.scaleRange = CGFloat(intensity)
-        confetti.scaleSpeed = CGFloat(-0.1 * intensity)
+        confetti.spin = CGFloat(M_PI_2)
+        confetti.spinRange = CGFloat(M_PI)
+        confetti.scaleRange = CGFloat(0.5)
+        confetti.scaleSpeed = CGFloat(-0.05)
         confetti.contents = imageForType(type)!.CGImage
         return confetti
     }
